@@ -2,9 +2,11 @@ import json
 from datetime import datetime
 
 from django.forms.models import model_to_dict
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+from orders.utils import check_open_order
 from robots.utils import create_robot, create_excel_table
 
 
@@ -13,8 +15,12 @@ from robots.utils import create_robot, create_excel_table
 def add_robot_view(request):
     body_unicode = request.body.decode('utf-8')
     data = json.loads(body_unicode)
-    new_robot = create_robot(data)
-    return JsonResponse(model_to_dict(new_robot))
+    try:
+        new_robot = create_robot(data)
+        check_open_order(data)
+        return JsonResponse(model_to_dict(new_robot))
+    except:
+        return HttpResponseBadRequest()
 
 @csrf_exempt
 @require_http_methods(["GET"])
