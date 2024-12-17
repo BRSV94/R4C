@@ -57,6 +57,9 @@ def create_excel_table():
             cur_page.title = robot.model
             cur_model = robot.model
             cur_page.append(['Модель', 'Версия', 'Количество за неделю'])
+            
+    cur_page.append(list(cur_serial_data.values()))
+
         
 
     temp_file = tempfile.NamedTemporaryFile(delete=False)
